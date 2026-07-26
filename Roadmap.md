@@ -262,6 +262,8 @@ Extend verification capabilities beyond hash comparison.
 Planned support:
 - Authenticode signatures
 - GPG signatures (.asc)
+- PGP signatures (.sig)
+- PGP fingerprint
 
 Goal:
 Provide additional authenticity verification for downloaded software.

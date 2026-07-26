@@ -190,7 +190,7 @@ function Add-DropBox
 
 
     ########################################################
-    # Drag Drop
+    # Drag & Drop
     ########################################################
 
     $Box.Add_DragDrop({
@@ -303,7 +303,7 @@ Add-DropBox `
 ############################################################
 
 Add-Label `
-"Manueller Hashwert optional" `
+"Manueller Hashwert (optional)" `
 20 `
 225
 

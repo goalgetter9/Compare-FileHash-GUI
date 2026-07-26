@@ -267,7 +267,7 @@ function Add-DropBox
 ############################################################
 
 Add-Label `
-"1. Datei zum Prüfen (Drag & Drop)" `
+"1. Datei zum Prüfen: Datei mittels Drag and Drop hinzufügen" `
 20 `
 20
 
@@ -285,7 +285,7 @@ Add-DropBox `
 ############################################################
 
 Add-Label `
-"2. Checksum-Datei optional (Drag & Drop)" `
+"2. Checksum-Datei (optional): Datei mittels Drag and Drop hinzufügen" `
 20 `
 125
 

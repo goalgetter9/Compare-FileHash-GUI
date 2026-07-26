@@ -73,7 +73,35 @@ Prevent incorrect comparisons caused by invalid input.
 
 ---
 
-# Version 2.4 – Extended Verification Features
+# Version 2.4 – Extended Verification & Hash Engine Support
+
+## ⚙️ Selectable Hash Engine
+**Priority: Medium**
+
+Add support for multiple hash calculation engines.
+
+Planned features:
+
+- Add a dropdown selection for the hash calculation method
+- Allow users to choose between:
+  - PowerShell `Get-FileHash`
+  - Windows `certutil`
+
+Example:
+Hash Engine:
+[ Get-FileHash ▼ ]
+
+Options:
+-Get-FileHash
+-certutil
+- OpenSSL
+- BLAKE3
+
+
+Goal:
+Provide users with more flexibility when calculating file hashes and improve compatibility with different Windows environments.
+
+---
 
 ## 📁 Multiple File Verification
 **Priority: High**

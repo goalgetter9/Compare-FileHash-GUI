@@ -21,9 +21,11 @@ Planned features:
 - Estimated remaining time
 
 Goal:
+
 Improve user experience when verifying large ISO images, backups, and archives.
 
 Example:
+
 Calculate SHA256...
 ████████████░░░░░░░ 62 %
 12.4 GB / 20 GB

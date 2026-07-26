@@ -59,4 +59,5 @@ This allows multiple verification processes to be reviewed, tracked, and archive
 ## Purpose
 
 Compare-FileHash-GUI combines a simple graphical workflow with transparent and reliable integrity verification.
+
 It is especially useful for users who want to verify downloaded files before use and ensure that files have not been corrupted or modified during transfer.

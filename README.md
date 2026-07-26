@@ -1,28 +1,62 @@
-Compare-FileHash-GUI ist ein grafisches PowerShell-Programm zur sicheren Überprüfung von Datei-Integrität mithilfe von kryptografischen Hashwerten.
+# Compare-FileHash-GUI
 
-Das Programm wurde entwickelt, um beispielsweise heruntergeladene ISO-Dateien, Backups oder andere große Dateien mit einem vom Hersteller
-bereitgestellten Prüfsummenwert zu vergleichen. Es unterstützt die gängigen Hashverfahren MD5, SHA1, SHA256, SHA384 und SHA512.
+Compare-FileHash-GUI is a graphical PowerShell application designed to securely verify file integrity using cryptographic hash values.
 
-Die Bedienung erfolgt komfortabel über eine grafische Oberfläche. Die zu überprüfende Datei kann per Drag & Drop in das Programm geladen werden.
-Zusätzlich kann entweder eine passende Checksum-Datei (z. B. SHA256SUMS) eingelesen werden oder ein Hashwert manuell eingefügt werden.
-Das Programm erkennt automatisch den benötigten Algorithmus aus der Checksum-Datei oder anhand der Hashlänge.
+The tool was developed to verify downloaded ISO images, backups, and other large files against checksum values provided by vendors or trusted sources. It supports the commonly used hashing algorithms:
 
-Bei einer Prüfung wird der tatsächliche Hashwert der Datei mit Get-FileHash berechnet und anschließend mit dem erwarteten Wert verglichen.
-Das Ergebnis wird übersichtlich dargestellt:
-Datei
-verwendete Checksum-Datei oder manuell eingegebener Hashwert
-verwendeter Algorithmus
-berechneter Hashwert
-erwarteter Hashwert
-Ergebnis (TRUE/FALSE)
+- MD5
+- SHA1
+- SHA256
+- SHA384
+- SHA512
 
-Während der Berechnung zeigt das Programm einen Status an, damit auch bei großen Dateien erkennbar bleibt, dass der Vorgang aktiv läuft.
+## Features
 
-Eine integrierte Reset-Funktion ermöglicht das schnelle Zurücksetzen aller Eingaben und die Durchführung weiterer Prüfungen ohne Neustart des Programms.
+- **Graphical user interface** for easy operation
+- **Drag & Drop support** for selecting files
+- Compare files against:
+  - checksum files (e.g. `SHA256SUMS`)
+  - manually entered hash values
+- Automatic algorithm detection:
+  - from checksum files
+  - based on hash length
+- Hash calculation using the native PowerShell `Get-FileHash` command
+- Clear comparison result display
 
-Zusätzlich wird jede Prüfung automatisch protokolliert. Die Logdatei enthält Datum und Uhrzeit, vollständigen Dateipfad, verwendeten Algorithmus,
-berechneten Hashwert, erwarteten Hashwert und das Vergleichsergebnis. Dadurch können mehrere Prüfungen nachvollzogen und archiviert werden.
+## Verification Process
 
+During verification, the program calculates the actual hash value of the selected file and compares it with the expected checksum.
 
-Compare-FileHash kombiniert damit eine einfache Bedienung mit einer transparenten und nachvollziehbaren Integritätsprüfung.
-Es eignet sich besonders für Anwender, die heruntergeladene Dateien vor der Verwendung zuverlässig auf Manipulation oder Übertragungsfehler überprüfen möchten.
+The result view displays:
+
+- File path
+- Used checksum file or manually entered hash value
+- Selected hash algorithm
+- Calculated hash value
+- Expected hash value
+- Verification result (`TRUE` / `FALSE`)
+
+## User Experience
+
+A status indicator shows the current operation state, ensuring that users can see that the process is still running, even when processing large files such as ISO images or backups.
+
+The integrated reset function allows users to quickly clear all inputs and perform additional checks without restarting the application.
+
+## Logging
+
+Each verification is automatically recorded in a log file.
+
+The log contains:
+- Date and time
+- Full file path
+- Used hash algorithm
+- Calculated hash value
+- Expected hash value
+- Verification result
+
+This allows multiple verification processes to be reviewed, tracked, and archived.
+
+## Purpose
+
+Compare-FileHash-GUI combines a simple graphical workflow with transparent and reliable integrity verification.
+It is especially useful for users who want to verify downloaded files before use and ensure that files have not been corrupted or modified during transfer.

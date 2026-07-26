@@ -262,7 +262,7 @@ Extend verification capabilities beyond hash comparison.
 Planned support:
 - Authenticode signatures
 - GPG signatures (.asc)
-- PGP signatures (.sig)
+- PGP signatures (.sig, .pgp, .gpg)
 - PGP fingerprint
 
 Goal:

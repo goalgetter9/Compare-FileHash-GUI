@@ -1,5 +1,5 @@
 <#
-    Compare-FileHash 2.0
+    Compare-FileHash-GUI
 
     Prüft Dateien gegen:
     - Checksum-Dateien
@@ -23,7 +23,10 @@
     - Ergebnisanzeige
     - Logging
     - Reset-Funktion
+	- Buttonstatus automatisch
+    - Statusanzeige
 #>
+
 
 
 ############################################################
@@ -62,11 +65,11 @@ New-Object System.Windows.Forms.Form
 
 
 $form.Text =
-"Compare File Hash 2.1"
+"Compare File Hash 2.2"
 
 
 $form.Size =
-New-Object System.Drawing.Size(780,780)
+New-Object System.Drawing.Size(780,820)
 
 
 $form.StartPosition =
@@ -75,7 +78,7 @@ $form.StartPosition =
 
 
 ############################################################
-# Label-Hilfsfunktion
+# Label Funktion
 ############################################################
 
 function Add-Label
@@ -110,10 +113,9 @@ function Add-Label
 
 
 ############################################################
-# Drag & Drop TextBox
+# Drag & Drop Box
 #
-# funktionierende Version
-# mit fester Referenz über param()
+# basiert auf funktionierender Version 2.1
 ############################################################
 
 function Add-DropBox
@@ -152,10 +154,6 @@ function Add-DropBox
     $Box.BackColor =
     [System.Drawing.Color]::White
 
-
-
-    # Kennzeichnung:
-    # FILE oder CHECKSUM
 
     $Box.Tag =
     $Type
@@ -227,7 +225,12 @@ function Add-DropBox
 
             }
 
+
+
+            Update-ButtonState
+
         }
+
 
     })
 
@@ -242,7 +245,7 @@ function Add-DropBox
 
 
 ############################################################
-# Prüfling
+# Prüflingsdatei
 ############################################################
 
 Add-Label `
@@ -304,7 +307,7 @@ $form.Controls.Add($hashBox)
 
 
 ############################################################
-# Algorithmus Auswahl
+# Algorithmus
 ############################################################
 
 Add-Label `
@@ -363,6 +366,13 @@ $button.Size =
 New-Object System.Drawing.Size(180,35)
 
 
+# neu:
+# beim Start deaktiviert
+
+$button.Enabled =
+$false
+
+
 $form.Controls.Add($button)
 
 
@@ -392,6 +402,30 @@ $form.Controls.Add($resetButton)
 
 
 ############################################################
+# Statusanzeige
+############################################################
+
+$statusLabel =
+New-Object System.Windows.Forms.Label
+
+
+$statusLabel.Text =
+"Bereit"
+
+
+$statusLabel.Location =
+New-Object System.Drawing.Point(20,370)
+
+
+$statusLabel.AutoSize =
+$true
+
+
+$form.Controls.Add($statusLabel)
+
+
+
+############################################################
 # Ergebnisanzeige
 ############################################################
 
@@ -400,7 +434,7 @@ New-Object System.Windows.Forms.TextBox
 
 
 $resultBox.Location =
-New-Object System.Drawing.Point(20,380)
+New-Object System.Drawing.Point(20,410)
 
 
 $resultBox.Size =
@@ -415,9 +449,6 @@ $resultBox.ReadOnly =
 $true
 
 
-# wichtig:
-# lange Hashwerte und Pfade sichtbar machen
-
 $resultBox.ScrollBars =
 "Both"
 
@@ -430,333 +461,97 @@ $form.Controls.Add($resultBox)
 
 
 
+
 ############################################################
 # Funktion:
-# Bereinigt Dateinamen für Vergleiche
+# Prüft, ob ein Vergleich möglich ist
+#
+# Regeln:
+#
+# Prüfen-Button aktiv wenn:
+#
+# 1. Prüflingsdatei vorhanden
+#
+# UND
+#
+# 2. entweder:
+#    - Checksum-Datei vorhanden
+#    - manueller Hash vorhanden
+#
 ############################################################
 
-function Normalize-FileName
+function Update-ButtonState
 {
-    param(
-        [string]$Name
-    )
 
+    $CanStart =
+    $false
+
+
+
+    ########################################################
+    # Prüflingsdatei vorhanden?
+    ########################################################
 
     if(
-    [string]::IsNullOrWhiteSpace($Name)
+    -not(
+    [string]::IsNullOrWhiteSpace(
+    $script:SelectedFile
     )
-    {
-        return ""
-    }
-
-
-    $Name =
-    $Name.Trim()
-
-
-    $Name =
-    $Name.Trim("*")
-
-
-    $Name =
-    $Name.Trim()
-
-
-
-    if(
-    $Name.StartsWith("./")
     )
-    {
-        $Name =
-        $Name.Substring(2)
-    }
-
-
-
-    return (
-        Split-Path `
-        $Name `
-        -Leaf
-    )
-
-}
-
-
-
-############################################################
-# Funktion:
-# Algorithmus anhand Hashlänge erkennen
-############################################################
-
-function Detect-AlgorithmFromHash
-{
-    param(
-        [string]$Hash
-    )
-
-
-    switch(
-    $Hash.Length
-    )
-    {
-
-        32
-        {
-            return "MD5"
-        }
-
-
-        40
-        {
-            return "SHA1"
-        }
-
-
-        64
-        {
-            return "SHA256"
-        }
-
-
-        96
-        {
-            return "SHA384"
-        }
-
-
-        128
-        {
-            return "SHA512"
-        }
-
-    }
-
-
-    return $null
-
-}
-
-
-
-############################################################
-# Funktion:
-# Vergleicht Dateinamen
-############################################################
-
-function Compare-ChecksumFileName
-{
-    param(
-        [string]$ChecksumName,
-        [string]$TargetFile
-    )
-
-
-    $ChecksumName =
-    Normalize-FileName `
-    $ChecksumName
-
-
-
-    $TargetName =
-    Normalize-FileName `
-    (
-        Split-Path `
-        $TargetFile `
-        -Leaf
-    )
-
-
-    return (
-        $ChecksumName `
-        -eq `
-        $TargetName
-    )
-
-}
-
-
-
-############################################################
-# Funktion:
-# Liest Hash aus Checksum-Datei
-############################################################
-
-function Get-ChecksumInformation
-{
-    param(
-        [string]$ChecksumPath,
-        [string]$TargetFile
-    )
-
-
-    if(
-    -not(Test-Path $ChecksumPath)
-    )
-    {
-        return $null
-    }
-
-
-
-    $Lines =
-    Get-Content `
-    -Path $ChecksumPath `
-    -Encoding UTF8
-
-
-
-    foreach(
-    $Line in $Lines
     )
     {
 
         if(
-        [string]::IsNullOrWhiteSpace($Line)
-        )
-        {
-            continue
-        }
-
-
-
-        ####################################################
-        # Format:
-        #
-        # SHA256 (Datei.iso) = HASH
-        #
-        ####################################################
-
-        if(
-        $Line -match
-        "^(SHA\d+|MD5)\s+\((.+)\)\s*=\s*([A-Fa-f0-9]{32,128})"
+        Test-Path $script:SelectedFile
         )
         {
 
-            $Algorithm =
-            $Matches[1].ToUpper()
-
-
-            $FileName =
-            $Matches[2]
-
-
-            $Hash =
-            $Matches[3].ToUpper()
-
-
+            ################################################
+            # Checksum-Datei vorhanden?
+            ################################################
 
             if(
-            Compare-ChecksumFileName `
-            $FileName `
-            $TargetFile
+            -not(
+            [string]::IsNullOrWhiteSpace(
+            $script:ChecksumFile
+            )
+            )
             )
             {
 
-                return @{
-                    Hash =
-                    $Hash
+                $CanStart =
+                $true
 
-                    Algorithm =
-                    $Algorithm
-                }
+            }
+
+
+
+            ################################################
+            # Oder manueller Hash vorhanden?
+            ################################################
+
+            if(
+            -not(
+            [string]::IsNullOrWhiteSpace(
+            $hashBox.Text
+            )
+            )
+            )
+            {
+
+                $CanStart =
+                $true
 
             }
 
         }
 
-
-
-        ####################################################
-        # GNU Format:
-        #
-        # HASH *Datei.iso
-        #
-        ####################################################
-
-        if(
-        $Line -match
-        "^([A-Fa-f0-9]{32,128})\s+\*?(.+)$"
-        )
-        {
-
-            $Hash =
-            $Matches[1].ToUpper()
-
-
-            $FileName =
-            $Matches[2]
-
-
-
-            if(
-            Compare-ChecksumFileName `
-            $FileName `
-            $TargetFile
-            )
-            {
-
-                return @{
-                    Hash =
-                    $Hash
-
-                    Algorithm =
-                    Detect-AlgorithmFromHash `
-                    $Hash
-                }
-
-            }
-
-        }
-
-
-
-        ####################################################
-        # Einfaches Format:
-        #
-        # HASH Datei.iso
-        #
-        ####################################################
-
-        if(
-        $Line -match
-        "^([A-Fa-f0-9]{32,128})\s+(.+)$"
-        )
-        {
-
-            $Hash =
-            $Matches[1].ToUpper()
-
-
-            $FileName =
-            $Matches[2]
-
-
-
-            if(
-            Compare-ChecksumFileName `
-            $FileName `
-            $TargetFile
-            )
-            {
-
-                return @{
-                    Hash =
-                    $Hash
-
-                    Algorithm =
-                    Detect-AlgorithmFromHash `
-                    $Hash
-                }
-
-            }
-
-        }
-
-
     }
 
 
-    return $null
+
+    $button.Enabled =
+    $CanStart
 
 }
 
@@ -764,60 +559,112 @@ function Get-ChecksumInformation
 
 ############################################################
 # Funktion:
-# Manuellen Hashwert verarbeiten
+# Setzt Statusmeldung
 ############################################################
 
-function Get-ManualHashInformation
+function Set-Status
 {
     param(
-        [string]$Hash,
-        [string]$Algorithm
+        [string]$Text,
+        [System.Drawing.Color]$Color =
+        [System.Drawing.Color]::Black
     )
 
 
-    if(
-    [string]::IsNullOrWhiteSpace($Hash)
-    )
-    {
-        return $null
-    }
+    $statusLabel.Text =
+    $Text
 
 
-
-    $Hash =
-    $Hash.Trim().ToUpper()
-
+    $statusLabel.ForeColor =
+    $Color
 
 
-    if(
-    [string]::IsNullOrWhiteSpace($Algorithm)
-    )
-    {
-        $Algorithm =
-        Detect-AlgorithmFromHash `
-        $Hash
-    }
+    # GUI sofort aktualisieren
 
-
-
-    if(
-    [string]::IsNullOrWhiteSpace($Algorithm)
-    )
-    {
-        return $null
-    }
-
-
-
-    return @{
-        Hash =
-        $Hash
-
-        Algorithm =
-        $Algorithm
-    }
+    $form.Refresh()
 
 }
+
+
+
+############################################################
+# Hash-Eingabe überwachen
+#
+# Wenn Benutzer manuell einen Hash einfügt,
+# wird der Vergleichsbutton aktualisiert.
+#
+############################################################
+
+$hashBox.Add_TextChanged({
+
+    Update-ButtonState
+
+})
+
+
+
+############################################################
+# Checksum-Datei ändern
+#
+# falls das Feld später programmgesteuert
+# verändert wird
+############################################################
+
+$checksumBox.Add_TextChanged({
+
+    if(
+    -not(
+    [string]::IsNullOrWhiteSpace(
+    $checksumBox.Text
+    )
+    )
+    )
+    {
+
+        $script:ChecksumFile =
+        $checksumBox.Text
+
+    }
+
+
+    Update-ButtonState
+
+})
+
+
+
+############################################################
+# Prüflingsdatei ändern
+############################################################
+
+$fileBox.Add_TextChanged({
+
+    if(
+    -not(
+    [string]::IsNullOrWhiteSpace(
+    $fileBox.Text
+    )
+    )
+    )
+    {
+
+        $script:SelectedFile =
+        $fileBox.Text
+
+    }
+
+
+    Update-ButtonState
+
+})
+
+
+
+############################################################
+# Initialer Zustand
+############################################################
+
+Update-ButtonState
 
 
 
@@ -833,7 +680,7 @@ $button.Add_Click({
     {
 
         ####################################################
-        # Prüfen ob Datei vorhanden ist
+        # Eingaben prüfen
         ####################################################
 
         if(
@@ -851,26 +698,22 @@ $button.Add_Click({
         -not(Test-Path $script:SelectedFile)
         )
         {
-            throw "Die Datei existiert nicht."
+            throw "Die ausgewählte Datei existiert nicht."
         }
 
 
 
         ####################################################
-        # Erwarteten Hash ermitteln
-        #
-        # Priorität:
-        #
-        # 1. Checksum-Datei
-        # 2. manueller Hash
-        #
+        # Vergleichswert bestimmen
         ####################################################
 
         $ExpectedInformation =
         $null
 
 
-        $ChecksumDisplay = "Hashwert wurde kopiert"
+        $ChecksumDisplay =
+        "Hashwert wurde kopiert"
+
 
 
         if(
@@ -900,10 +743,13 @@ $button.Add_Click({
             $null -eq $ExpectedInformation
             )
             {
-                throw "Kein passender Hash in der Checksum-Datei gefunden."
+                throw "
+Kein passender Hash in der Checksum-Datei gefunden.
+"
             }
 
         }
+
         else
         {
 
@@ -920,7 +766,9 @@ $button.Add_Click({
             $null -eq $ExpectedInformation
             )
             {
-                throw "Kein gültiger Hashwert vorhanden."
+                throw "
+Kein gültiger Hashwert angegeben.
+"
             }
 
         }
@@ -928,7 +776,7 @@ $button.Add_Click({
 
 
         ####################################################
-        # Werte übernehmen
+        # Algorithmus übernehmen
         ####################################################
 
         $ExpectedHash =
@@ -937,6 +785,26 @@ $button.Add_Click({
 
         $Algorithm =
         $ExpectedInformation.Algorithm
+
+
+
+        ####################################################
+        # Status anzeigen
+        ####################################################
+
+        Set-Status `
+        "Berechne $Algorithm Hash... Bitte warten." `
+        ([System.Drawing.Color]::Blue)
+
+
+
+        ####################################################
+        # GUI aktualisieren
+        #
+        # wichtig bei großen ISO-Dateien
+        ####################################################
+
+        [System.Windows.Forms.Application]::DoEvents()
 
 
 
@@ -967,7 +835,7 @@ $button.Add_Click({
 
 
         ####################################################
-        # Ergebnisanzeige
+        # Ergebnis anzeigen
         ####################################################
 
         $resultBox.Text =
@@ -996,29 +864,34 @@ $Result
 
         if($Result)
         {
+
             $resultBox.ForeColor =
             [System.Drawing.Color]::Green
+
+
+            Set-Status `
+            "Vergleich erfolgreich." `
+            ([System.Drawing.Color]::Green)
+
         }
+
         else
         {
+
             $resultBox.ForeColor =
             [System.Drawing.Color]::Red
+
+
+            Set-Status `
+            "Hashwerte stimmen nicht überein." `
+            ([System.Drawing.Color]::Red)
+
         }
 
 
 
         ####################################################
         # Log schreiben
-        #
-        # Format:
-        #
-        # Datum: ...
-        # Datei: ...
-        # Algorithmus: ...
-        # Hashwert (berechnet): ...
-        # Hashwert (erwartet): ...
-        # Ergebnis: ...
-        #
         ####################################################
 
         $Timestamp =
@@ -1052,6 +925,12 @@ $Result
 
     catch
     {
+
+        Set-Status `
+        "Fehler aufgetreten." `
+        ([System.Drawing.Color]::Red)
+
+
 
         $resultBox.Text =
         $_.Exception.Message
@@ -1091,15 +970,20 @@ $resetButton.Add_Click({
     ########################################################
 
     $fileBox.Clear()
+
     $checksumBox.Clear()
+
     $hashBox.Clear()
 
 
+
     ########################################################
-    # Standardwerte setzen
+    # Algorithmus zurücksetzen
     ########################################################
 
-    $algorithmBox.SelectedItem = "SHA256"
+    $algorithmBox.SelectedItem =
+    "SHA256"
+
 
 
     ########################################################
@@ -1108,8 +992,25 @@ $resetButton.Add_Click({
 
     $resultBox.Clear()
 
-    $resultBox.ForeColor =
-    [System.Drawing.Color]::Black
+
+
+    ########################################################
+    # Status zurücksetzen
+    ########################################################
+
+    Set-Status `
+    "Bereit." `
+    ([System.Drawing.Color]::Black)
+
+
+
+    ########################################################
+    # Button wieder deaktivieren
+    ########################################################
+
+    Update-ButtonState
+
+
 })
 
 

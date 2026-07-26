@@ -61,11 +61,3 @@ This allows multiple verification processes to be reviewed, tracked, and archive
 Compare-FileHash-GUI combines a simple graphical workflow with transparent and reliable integrity verification.
 
 It is especially useful for users who want to verify downloaded files before use and ensure that files have not been corrupted or modified during transfer.
-
-## ToDo
-
-- Real progress bar support for large files (using a custom FileStream implementation instead of Get-FileHash)
-- Support for verifying multiple files simultaneously
-- Export of verification results as CSV/JSON
-- PowerShell script signing for trusted execution
-- Automatic detection of downloaded .sha256, .sha512, and .md5 checksum files in the same directory

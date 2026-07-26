@@ -20,17 +20,14 @@ Planned features:
 - Calculation speed
 - Estimated remaining time
 
-Goal:<br>
+### Goal:
 Improve user experience when verifying large ISO images, backups, and archives.
 
-Example:<br>
-Calculate SHA256...<br>
-████████████░░░░░░░ 62 %<br>
-
+### Example:
+Calculate SHA256...
+████████████░░░░░░░ 62 %
 12.4 GB / 20 GB
-
 Speed: 450 MB/s
-
 Remaining time: 18 Sekunden
 
 ---

@@ -208,7 +208,8 @@ Example:
 Compare-FileHash.exe `
 -File Fedora.iso `
 -Hash ABC123... `
--Algorithm SHA256```
+-Algorithm SHA256
+```
 
 Use cases:
 - Automation scripts

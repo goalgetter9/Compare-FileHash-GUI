@@ -92,12 +92,11 @@ Planned features:
   - Windows `certutil`
 
 Example:
-Hash Engine:
-[ Get-FileHash ▼ ]
+Hash Engine: [ Get-FileHash ▼ ]
 
 Options:
--Get-FileHash
--certutil
+- Get-FileHash
+- certutil
 - OpenSSL
 - BLAKE3
 

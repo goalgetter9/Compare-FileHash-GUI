@@ -6,7 +6,13 @@ The roadmap is subject to change based on project requirements, user feedback, a
 
 ---
 
-# Version 2.3 – Usability & Performance Improvements
+# Version 1.1.1 – Usability
+
+When you add a new file and there was already a file drag and dropped to the app, the app should reset and delete all saved values.
+
+---
+
+# Version 1.2 – Usability & Performance Improvements
 
 ## 🚀 Large File Progress Support
 **Priority: High**
@@ -77,7 +83,7 @@ Prevent incorrect comparisons caused by invalid input.
 
 ---
 
-# Version 2.4 – Extended Verification & Hash Engine Support
+# Version 1.3 – Extended Verification & Hash Engine Support
 
 ## ⚙️ Selectable Hash Engine
 **Priority: Medium**
@@ -173,7 +179,7 @@ Provide additional context during verification.
 
 ---
 
-# Version 2.5 – User Interface Improvements
+# Version 1.4 – User Interface Improvements
 
 ## 🌙 Modern UI & Dark Mode
 **Priority: Low**
@@ -227,7 +233,7 @@ Make the application accessible to a wider audience.
 
 ---
 
-# Version 2.6 – Advanced Integration & Automation
+# Version 1.5 – Advanced Integration & Automation
 
 ## ⌨️ Command-Line Interface
 **Priority: High**
@@ -252,7 +258,7 @@ Enable professional and automated verification workflows.
 
 ---
 
-# Version 2.7 – Advanced Verification
+# Version 1.6 – Advanced Verification
 
 ## 🔐 Digital Signature Verification
 **Priority: Medium**
